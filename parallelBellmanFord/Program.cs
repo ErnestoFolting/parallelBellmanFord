@@ -7,10 +7,10 @@ namespace parallelBellmanFord
     {
         static void Main(string[] args)
         {
-            string path = "adjacency.txt";
+            string path = "adjacencySimple6Verticles.txt";
             List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
-            MatrixHelper.printMatrix(adjacencyMatrix);
-            Console.WriteLine();
+            //MatrixHelper.printMatrix(adjacencyMatrix);
+            //Console.WriteLine();
 
             ConsecutiveSolver consSolver = new(adjacencyMatrix, 0);
 

@@ -1,4 +1,5 @@
-﻿using parallelBellmanFord.Interfaces;
+﻿using parallelBellmanFord.Common;
+using parallelBellmanFord.Interfaces;
 
 namespace parallelBellmanFord.Solvers.Consecutive
 {
@@ -24,33 +25,57 @@ namespace parallelBellmanFord.Solvers.Consecutive
             _distancesToVerticles[_startVerticleIndex] = 0;
             for(int timesCount = 0; timesCount < _verticlesCount-1; timesCount++)
             {
-                for(int i=0;i<_verticlesCount;i++)
+                makeIteration();
+            }
+
+            CheckForNegativeCycle();
+
+            ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
+            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+        }
+
+        private bool makeIteration()
+        {
+            bool ifWasUpdated = false;
+            for (int i = 0; i < _verticlesCount; i++)
+            {
+                for (int j = 0; j < _verticlesCount; j++)
                 {
-                    for(int j=0;j<_verticlesCount;j++)
+                    if (i != j)
                     {
-                        Update(i, j);
+                        if (Update(i, j))
+                        {
+                            ifWasUpdated = true;
+                        }
                     }
                 }
             }
-            _distancesToVerticles.ForEach(el => Console.WriteLine(el));
-
+            return ifWasUpdated;
         }
-        private void Update(int fromVerticle,int toVerticle)
+
+        private bool Update(int fromVerticle,int toVerticle)
         {
-            if (_adjacencyMatrix[fromVerticle][toVerticle]!= 0 && fromVerticle != toVerticle && _distancesToVerticles[fromVerticle] != int.MaxValue)
+            bool ifUpdated = false;
+            if (_adjacencyMatrix[fromVerticle][toVerticle]!= 0 && _distancesToVerticles[fromVerticle] != int.MaxValue)
             {
                 int newFromVerticalDistance = _distancesToVerticles[fromVerticle] + _adjacencyMatrix[fromVerticle][toVerticle];
                 if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
                 {
                     _distancesToVerticles[toVerticle] = newFromVerticalDistance;
                     _comeFromIndex[toVerticle] = fromVerticle;
+                    ifUpdated = true;
                 }
             }
+            return ifUpdated;
         }
 
         private void CheckForNegativeCycle()
         {
-
+            if (makeIteration())
+            {
+                Console.WriteLine("The Graph has negative cycle. Can not solve.");
+                System.Environment.Exit(0);
+            }
         }
     }
 }
