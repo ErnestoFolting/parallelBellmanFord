@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "parallelBellmanFord", "parallelBellmanFord\parallelBellmanFord.csproj", "{813FE1F9-3251-4186-B55E-A50921229872}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{813FE1F9-3251-4186-B55E-A50921229872}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{813FE1F9-3251-4186-B55E-A50921229872}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{813FE1F9-3251-4186-B55E-A50921229872}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{813FE1F9-3251-4186-B55E-A50921229872}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EFD2EE88-D766-4AF5-A32F-B7A5ED5AC587}
+	EndGlobalSection
+EndGlobal
