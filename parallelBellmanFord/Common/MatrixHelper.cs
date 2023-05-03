@@ -43,10 +43,36 @@ namespace parallelBellmanFord.Common
             {
                 for(int j = 0; j < matr[i].Count;j++)
                 {
-                    Console.Write(matr[i][j] + " ");
+                    Console.Write("{0,-5}",matr[i][j]);
                 }
                 Console.WriteLine();
             }
+        }
+
+        public static List<List<int>> generateFullAdjacencyMatrix(int vertexCount)
+        {
+            List<List<int>> matrix = new();
+            Random rand = new Random();
+
+            for (int i = 0; i < vertexCount; i++)
+            {
+                List<int> temp = new();
+                for (int j = 0; j < vertexCount; j++)
+                {
+                    if (i != j)
+                    {
+                        int weight = rand.Next(1, 11);
+                        if (weight == 0) weight++;
+                        temp.Add(weight);
+                    }
+                    else
+                    {
+                        temp.Add(0);
+                    }
+                }
+                matrix.Add(temp);
+            }
+            return matrix;
         }
     }
 }

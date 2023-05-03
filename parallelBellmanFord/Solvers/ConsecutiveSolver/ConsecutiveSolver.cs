@@ -23,7 +23,13 @@ namespace parallelBellmanFord.Solvers.Consecutive
         public void Solve()
         {
             _distancesToVerticles[_startVerticleIndex] = 0;
-            for(int timesCount = 0; timesCount < _verticlesCount-1; timesCount++)
+
+            //System.Threading.Tasks.Parallel.For(0, _verticlesCount - 1, timesCount =>
+            //{
+            //    makeIteration();
+            //});
+
+            for (int timesCount = 0; timesCount < _verticlesCount - 1; timesCount++)
             {
                 makeIteration();
             }
@@ -56,7 +62,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
         private bool Update(int fromVerticle,int toVerticle)
         {
             bool ifUpdated = false;
-            if (_adjacencyMatrix[fromVerticle][toVerticle]!= 0 && _distancesToVerticles[fromVerticle] != int.MaxValue)
+            if (_adjacencyMatrix[fromVerticle][toVerticle]!= 0 && _distancesToVerticles[fromVerticle] != int.MaxValue && toVerticle != _startVerticleIndex)
             {
                 int newFromVerticalDistance = _distancesToVerticles[fromVerticle] + _adjacencyMatrix[fromVerticle][toVerticle];
                 if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
