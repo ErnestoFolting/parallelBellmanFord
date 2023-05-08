@@ -20,14 +20,9 @@ namespace parallelBellmanFord.Solvers.Consecutive
             _startVerticleIndex = verticleToStartFrom;
         }
 
-        public void Solve()
+        public (List<int> distances, List<int> comeFrom) SolveConsecutive()
         {
             _distancesToVerticles[_startVerticleIndex] = 0;
-
-            //System.Threading.Tasks.Parallel.For(0, _verticlesCount - 1, timesCount =>
-            //{
-            //    makeIteration();
-            //});
 
             for (int timesCount = 0; timesCount < _verticlesCount - 1; timesCount++)
             {
@@ -38,6 +33,8 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
             ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
             ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+
+            return (_distancesToVerticles, _comeFromIndex);
         }
 
         private bool makeIteration()
@@ -47,7 +44,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
             {
                 for (int j = 0; j < _verticlesCount; j++)
                 {
-                    if (i != j)
+                    if (i != j && _adjacencyMatrix[i][j] != 0) //only edges that have weight and not loops
                     {
                         if (Update(i, j))
                         {
@@ -62,15 +59,17 @@ namespace parallelBellmanFord.Solvers.Consecutive
         private bool Update(int fromVerticle,int toVerticle)
         {
             bool ifUpdated = false;
-            if (_adjacencyMatrix[fromVerticle][toVerticle]!= 0 && _distancesToVerticles[fromVerticle] != int.MaxValue && toVerticle != _startVerticleIndex)
+            if (_distancesToVerticles[fromVerticle] != int.MaxValue && toVerticle != _startVerticleIndex) //if the fromVerticle is examined and not to startVerticle cycle
             {
                 int newFromVerticalDistance = _distancesToVerticles[fromVerticle] + _adjacencyMatrix[fromVerticle][toVerticle];
+
                 if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
                 {
                     _distancesToVerticles[toVerticle] = newFromVerticalDistance;
                     _comeFromIndex[toVerticle] = fromVerticle;
                     ifUpdated = true;
                 }
+
             }
             return ifUpdated;
         }
