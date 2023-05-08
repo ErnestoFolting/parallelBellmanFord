@@ -9,8 +9,9 @@ namespace parallelBellmanFord
         static void Main(string[] args)
         {
             string path = "adjacencySimple6Verticles.txt";
-            List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
-            //List<List<int>> adjacencyMatrix = MatrixHelper.generateFullAdjacencyMatrix(500);
+            //List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
+            //List<List<int>> adjacencyMatrix = MatrixHelper.generateFullAdjacencyMatrix(1500);
+            List<List<int>> adjacencyMatrix = MatrixHelper.generateMaxPathMatrix(1000);
             //MatrixHelper.printMatrix(adjacencyMatrix);
 
             //Console.WriteLine("Consecutive = 0, Parallel = 1:, Compare = 2\n");

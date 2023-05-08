@@ -74,5 +74,28 @@ namespace parallelBellmanFord.Common
             }
             return matrix;
         }
+
+        public static List<List<int>> generateMaxPathMatrix(int vertexCount)
+        {
+            List<List<int>> matrix = new();
+            Random rand = new Random();
+            for (int i = 0; i < vertexCount; i++)
+            {
+                List<int> temp = new();
+                for (int j = 0; j < vertexCount; j++)
+                {
+                    temp.Add(0);
+                }
+                matrix.Add(temp);
+            }
+
+            matrix[0][vertexCount - 1] = vertexCount + 1;
+
+            for (int i = 0; i < vertexCount-1; i++)
+            {
+                matrix[i][i + 1] = 1;
+            }
+            return matrix;
+        }
     }
 }
