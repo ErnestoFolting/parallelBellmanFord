@@ -8,18 +8,19 @@ namespace parallelBellmanFord
     {
         static void Main(string[] args)
         {
-            string path = "adjacencySimple6Verticles2.txt";
+            string path = "adjacencySimple6Verticles.txt";
 
             //List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
-            List<List<int>> adjacencyMatrix = MatrixHelper.generateAdjacencyMatrix(500, 2);
+            //List<List<int>> adjacencyMatrix = MatrixHelper.generateFullAdjacencyMatrix(500);
+            List<List<int>> adjacencyMatrix = MatrixHelper.generateAdjacencyMatrix(400,3);
             //List<List<int>> adjacencyMatrix = MatrixHelper.generateMaxIterationMatrix(1000);
             //MatrixHelper.printMatrix(adjacencyMatrix);
 
             //Console.WriteLine("Consecutive = 0, Parallel = 1:, Compare = 2\n");
             //int solverType = Convert.ToInt32(Console.ReadLine());
 
-            int solverType = 2;
-            const int threadsNumber = 2;
+            int solverType = 0;
+            const int threadsNumber = 16;
             int startTop = 0;
 
             ThreadPool.GetMinThreads(out _, out var IOMin);
@@ -32,7 +33,7 @@ namespace parallelBellmanFord
             {
                 ConsecutiveSolver consecutiveSolver = new(adjacencyMatrix, startTop);
                 long startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                consecutiveSolver.SolveConsecutive();
+                consecutiveSolver.SolveConsecutiveWave();
                 long endTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 Console.WriteLine("Consecutive time: " + (endTime - startTime));
             }
@@ -48,7 +49,7 @@ namespace parallelBellmanFord
             {
                 long consecutiveStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 ConsecutiveSolver consecutiveSolver = new(adjacencyMatrix, startTop);
-                (List<int> distancesConsecutive, List<int> comeFromConsecutive) = consecutiveSolver.SolveConsecutive();
+                (List<int> distancesConsecutive, List<int> comeFromConsecutive) = consecutiveSolver.SolveConsecutiveWave();
                 long consecutiveEndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
                 long parallelStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();

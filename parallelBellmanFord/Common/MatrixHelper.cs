@@ -61,16 +61,7 @@ namespace parallelBellmanFord.Common
                 {
                     if (i != j)
                     {
-                        int ifNegative = rand.Next(0, 100);
-                        int weight = 0;
-                        if (ifNegative == 0)
-                        {
-                            weight = rand.Next(-10, -1);
-                        }
-                        else
-                        {
-                            weight = rand.Next(100, 200);
-                        }
+                        int weight = rand.Next(1, 10);
                         temp.Add(weight);
                     }
                     else

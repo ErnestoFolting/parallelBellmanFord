@@ -56,6 +56,7 @@ namespace parallelBellmanFord.Solvers.Parallel
             return (_distancesToVerticles, _comeFromIndex);
         }
 
+
         private bool makeIteration()
         {;
             bool ifWasUpdated = false;

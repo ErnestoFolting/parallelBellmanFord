@@ -33,7 +33,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
             CheckForNegativeCycle();
 
-            //printResult();
+            printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
@@ -66,15 +66,86 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
                 if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
                 {
-                    
                     _distancesToVerticles[toVerticle] = newFromVerticalDistance;
                     _comeFromIndex[toVerticle] = fromVerticle;
                     ifUpdated = true;
-                    //Console.WriteLine("From " + Thread.CurrentThread.ManagedThreadId + " distances[1] " + _distancesToVerticles[_verticlesCount - 1]);
                 }
-
             }
             return ifUpdated;
+        }
+
+        public (List<int> distances, List<int> comeFrom) SolveConsecutiveWave()
+        {
+            _distancesToVerticles[_startVerticleIndex] = 0;
+            for (int timesCount = 0; timesCount < _verticlesCount - 1; timesCount++)
+            {
+                makeIterationWave();
+            }
+
+            CheckForNegativeCycle();
+
+            //printResult();
+
+            return (_distancesToVerticles, _comeFromIndex);
+        }
+
+        private void makeIterationWave()
+        {
+            bool[] visited = new bool[_verticlesCount];
+            List<int> verticles = new() { _startVerticleIndex };
+            expandVerticles(verticles);
+            visited[_startVerticleIndex] = true;
+            List<int> nearVerticles = findNearVerticles(verticles, ref visited);
+            while (nearVerticles.Count !=0)
+            {
+                int nearCount = nearVerticles.Count;
+                if (nearCount > 1)
+                {
+                    int firstCount = nearCount / 2;
+                    int secondCount = nearCount - firstCount;
+                    List<int> firstList = nearVerticles.Take(firstCount).ToList();
+                    List<int> secondList = nearVerticles.Skip(firstCount).ToList();
+                    Task firstTask = new Task(() => expandVerticles(firstList));
+                    Task secondTask = new Task(() => expandVerticles(secondList));
+                    firstTask.Start();
+                    secondTask.Start();
+                    firstTask.Wait();
+                    secondTask.Wait();
+                }
+                //expandVerticles(nearVerticles);
+                nearVerticles = findNearVerticles(nearVerticles, ref visited);
+            }
+        }
+
+        private List<int> findNearVerticles(List<int> borderVerticles, ref bool[] visited)
+        {
+            List<int> near = new();
+            foreach (int borderVerticle in borderVerticles)
+            {
+                for(int i = 0; i < _verticlesCount; i++)
+                {
+                    if (borderVerticle != i && _adjacencyMatrix[borderVerticle][i] != 0 && !visited[i])
+                    {
+                        near.Add(i);
+                        visited[i] = true;
+                    }
+                }
+            }
+            return near;
+        }
+
+        private void expandVerticles(List<int> verticlesToExpand)
+        {
+            foreach (int verticleToExpand in verticlesToExpand)
+            {
+                for (int j = 0; j < _verticlesCount; j++)
+                {
+                    if (verticleToExpand != j && _adjacencyMatrix[verticleToExpand][j] != 0)
+                    {
+                        Update(verticleToExpand, j);
+                    }
+                }
+            }
         }
 
         private void CheckForNegativeCycle()
@@ -89,7 +160,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
         private void printResult()
         {
             ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex,_adjacencyMatrix);
+            //ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex,_adjacencyMatrix);
         }
     }
 }
