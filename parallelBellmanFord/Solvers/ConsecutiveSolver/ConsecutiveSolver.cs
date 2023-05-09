@@ -82,14 +82,14 @@ namespace parallelBellmanFord.Solvers.Consecutive
             if (makeIteration())
             {
                 Console.WriteLine("The Graph has negative cycle. Can not solve.");
-                //System.Environment.Exit(0);
+                System.Environment.Exit(0);
             }
         }
 
         private void printResult()
         {
             ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex,_adjacencyMatrix);
         }
     }
 }

@@ -18,7 +18,7 @@
             }
         }
 
-        public static void printPaths(List<int> comeFromIndex, int startVertexIndex)
+        public static void printPaths(List<int> comeFromIndex, int startVertexIndex, List<List<int>> adjacencyMatrix)
         {
             Console.WriteLine("\nPaths:");
             for(int i =0; i < comeFromIndex.Count; i++)
@@ -39,18 +39,20 @@
                 {
                     reversePath.Add(i);
                 }
-                pathOuput(reversePath);
+                pathOutput(reversePath, adjacencyMatrix);
             }
         }
-        private static void pathOuput(List<int> reversePath)
+        private static void pathOutput(List<int> reversePath,List<List<int>> adjacencyMatrix)
         {
             reversePath.Reverse();
             for(int i =0;i< reversePath.Count; i++)
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(reversePath[i]);
+                Console.ForegroundColor = ConsoleColor.Gray;
                 if (i != reversePath.Count - 1)
                 {
-                    Console.Write(" -> ");
+                    Console.Write( "  (" + adjacencyMatrix[reversePath[i]][reversePath[i+1]] + ")  ");
                 }
             }
             Console.WriteLine();

@@ -11,16 +11,16 @@ namespace parallelBellmanFord
             string path = "adjacencySimple6Verticles2.txt";
 
             //List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
-            //List<List<int>> adjacencyMatrix = MatrixHelper.generateFullAdjacencyMatrix(1500);
-            List<List<int>> adjacencyMatrix = MatrixHelper.generateMaxIterationMatrix(1000);
+            List<List<int>> adjacencyMatrix = MatrixHelper.generateAdjacencyMatrix(500, 2);
+            //List<List<int>> adjacencyMatrix = MatrixHelper.generateMaxIterationMatrix(1000);
             //MatrixHelper.printMatrix(adjacencyMatrix);
 
             //Console.WriteLine("Consecutive = 0, Parallel = 1:, Compare = 2\n");
             //int solverType = Convert.ToInt32(Console.ReadLine());
 
             int solverType = 2;
-            const int threadsNumber = 16;
-            int startTop = 999;
+            const int threadsNumber = 2;
+            int startTop = 0;
 
             ThreadPool.GetMinThreads(out _, out var IOMin);
             ThreadPool.SetMinThreads(threadsNumber, IOMin);

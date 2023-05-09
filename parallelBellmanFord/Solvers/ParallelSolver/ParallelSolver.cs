@@ -1,6 +1,5 @@
 ﻿using parallelBellmanFord.Common;
 using parallelBellmanFord.Interfaces;
-using System.Threading.Tasks;
 
 namespace parallelBellmanFord.Solvers.Parallel
 {
@@ -52,7 +51,7 @@ namespace parallelBellmanFord.Solvers.Parallel
 
             CheckForNegativeCycle();
 
-            //printResult();
+            printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
@@ -61,20 +60,16 @@ namespace parallelBellmanFord.Solvers.Parallel
         {;
             bool ifWasUpdated = false;
 
-                for (int i = 0; i < _verticlesCount; i++)
-                {
-                lock (_distancesToVerticles)
+            for (int i = 0; i < _verticlesCount; i++)
+            {
+                for (int j = 0; j < _verticlesCount; j++)
                 {
 
-                    for (int j = 0; j < _verticlesCount; j++)
+                    if (i != j && _adjacencyMatrix[i][j] != 0) //only edges that have weight and not loops
                     {
-
-                        if (i != j && _adjacencyMatrix[i][j] != 0) //only edges that have weight and not loops
+                        if (Update(i, j))
                         {
-                            if (Update(i, j))
-                            {
-                                ifWasUpdated = true;
-                            }
+                            ifWasUpdated = true;
                         }
                     }
                 }
@@ -114,7 +109,7 @@ namespace parallelBellmanFord.Solvers.Parallel
         private void printResult()
         {
             ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex,_adjacencyMatrix);
         }
     }
 }
