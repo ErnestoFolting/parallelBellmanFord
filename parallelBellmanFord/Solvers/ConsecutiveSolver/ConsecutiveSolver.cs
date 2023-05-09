@@ -9,6 +9,8 @@ namespace parallelBellmanFord.Solvers.Consecutive
         private List<int> _distancesToVerticles;
         private List<int> _comeFromIndex;
 
+        public static List<int> times = new(); 
+
         private int _startVerticleIndex;
         private int _verticlesCount;
         public ConsecutiveSolver(List<List<int>> adjacencMatrix, int verticleToStartFrom)
@@ -31,8 +33,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
             CheckForNegativeCycle();
 
-            ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+            //printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
@@ -65,9 +66,11 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
                 if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
                 {
+                    
                     _distancesToVerticles[toVerticle] = newFromVerticalDistance;
                     _comeFromIndex[toVerticle] = fromVerticle;
                     ifUpdated = true;
+                    //Console.WriteLine("From " + Thread.CurrentThread.ManagedThreadId + " distances[1] " + _distancesToVerticles[_verticlesCount - 1]);
                 }
 
             }
@@ -79,8 +82,14 @@ namespace parallelBellmanFord.Solvers.Consecutive
             if (makeIteration())
             {
                 Console.WriteLine("The Graph has negative cycle. Can not solve.");
-                System.Environment.Exit(0);
+                //System.Environment.Exit(0);
             }
+        }
+
+        private void printResult()
+        {
+            ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
+            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
         }
     }
 }

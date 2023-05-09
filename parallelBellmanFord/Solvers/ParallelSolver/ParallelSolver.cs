@@ -1,5 +1,6 @@
 ﻿using parallelBellmanFord.Common;
 using parallelBellmanFord.Interfaces;
+using System.Threading.Tasks;
 
 namespace parallelBellmanFord.Solvers.Parallel
 {
@@ -8,6 +9,8 @@ namespace parallelBellmanFord.Solvers.Parallel
         private List<List<int>> _adjacencyMatrix;
         private List<int> _distancesToVerticles;
         private List<int> _comeFromIndex;
+
+        public static List<int> times = new();
 
         private int _startVerticleIndex;
         private int _verticlesCount;
@@ -24,10 +27,12 @@ namespace parallelBellmanFord.Solvers.Parallel
         public (List<int> distances, List<int> comeFrom) SolveTasks()
         {
             Task[] tasks = new Task[_verticlesCount - 1];
-
             for (int timesCount = 0; timesCount < _verticlesCount - 1; timesCount++)
             {
-                Task currentTask = new Task(() => makeIteration());
+                Task currentTask = new Task(() =>
+                {
+                    makeIteration();
+                });
                 tasks[timesCount] = currentTask;
                 tasks[timesCount].Start();
             }
@@ -36,8 +41,7 @@ namespace parallelBellmanFord.Solvers.Parallel
 
             CheckForNegativeCycle();
 
-            ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+            //printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
@@ -48,28 +52,34 @@ namespace parallelBellmanFord.Solvers.Parallel
 
             CheckForNegativeCycle();
 
-            ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
+            //printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
 
         private bool makeIteration()
-        {
+        {;
             bool ifWasUpdated = false;
-            for (int i = 0; i < _verticlesCount; i++)
-            {
-                for (int j = 0; j < _verticlesCount; j++)
+
+                for (int i = 0; i < _verticlesCount; i++)
                 {
-                    if (i != j && _adjacencyMatrix[i][j] != 0) //only edges that have weight and not loops
+                lock (_distancesToVerticles)
+                {
+
+                    for (int j = 0; j < _verticlesCount; j++)
                     {
-                        if (Update(i, j))
+
+                        if (i != j && _adjacencyMatrix[i][j] != 0) //only edges that have weight and not loops
                         {
-                            ifWasUpdated = true;
+                            if (Update(i, j))
+                            {
+                                ifWasUpdated = true;
+                            }
                         }
                     }
                 }
             }
+           
             return ifWasUpdated;
         }
 
@@ -81,17 +91,14 @@ namespace parallelBellmanFord.Solvers.Parallel
                 int newFromVerticalDistance = _distancesToVerticles[fromVerticle] + _adjacencyMatrix[fromVerticle][toVerticle];
                 if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
                 {
-                    lock (_distancesToVerticles)
-                    {
-                        _distancesToVerticles[toVerticle] = newFromVerticalDistance;
-                    }
-                    lock (_comeFromIndex)
-                    {
-                        _comeFromIndex[toVerticle] = fromVerticle;
-                    }
+                    _distancesToVerticles[toVerticle] = newFromVerticalDistance;
+                    _comeFromIndex[toVerticle] = fromVerticle;
                     ifUpdated = true;
+
+                    //Console.WriteLine("From " + Thread.CurrentThread.ManagedThreadId + " distances[" + toVerticle + "] = " + _distancesToVerticles[toVerticle]);
                 }
             }
+
             return ifUpdated;
         }
 
@@ -102,6 +109,12 @@ namespace parallelBellmanFord.Solvers.Parallel
                 Console.WriteLine("The Graph has negative cycle. Can not solve.");
                 System.Environment.Exit(0);
             }
+        }
+
+        private void printResult()
+        {
+            ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
+            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex);
         }
     }
 }
