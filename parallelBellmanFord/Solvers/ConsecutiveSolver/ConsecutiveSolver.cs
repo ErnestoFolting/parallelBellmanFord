@@ -33,7 +33,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
             CheckForNegativeCycle();
 
-            printResult();
+            //printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
@@ -74,6 +74,8 @@ namespace parallelBellmanFord.Solvers.Consecutive
             return ifUpdated;
         }
 
+        //***********************************************************************Wave******************************************************************************
+
         public (List<int> distances, List<int> comeFrom) SolveConsecutiveWave()
         {
             _distancesToVerticles[_startVerticleIndex] = 0;
@@ -84,11 +86,11 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
             CheckForNegativeCycle();
 
-            //printResult();
+            printResult();
 
             return (_distancesToVerticles, _comeFromIndex);
         }
-
+         
         private void makeIterationWave()
         {
             bool[] visited = new bool[_verticlesCount];
@@ -98,21 +100,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
             List<int> nearVerticles = findNearVerticles(verticles, ref visited);
             while (nearVerticles.Count !=0)
             {
-                int nearCount = nearVerticles.Count;
-                if (nearCount > 1)
-                {
-                    int firstCount = nearCount / 2;
-                    int secondCount = nearCount - firstCount;
-                    List<int> firstList = nearVerticles.Take(firstCount).ToList();
-                    List<int> secondList = nearVerticles.Skip(firstCount).ToList();
-                    Task firstTask = new Task(() => expandVerticles(firstList));
-                    Task secondTask = new Task(() => expandVerticles(secondList));
-                    firstTask.Start();
-                    secondTask.Start();
-                    firstTask.Wait();
-                    secondTask.Wait();
-                }
-                //expandVerticles(nearVerticles);
+                expandVerticles(nearVerticles);
                 nearVerticles = findNearVerticles(nearVerticles, ref visited);
             }
         }
@@ -160,7 +148,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
         private void printResult()
         {
             ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
-            //ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex,_adjacencyMatrix);
+            ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex, _adjacencyMatrix);
         }
     }
 }

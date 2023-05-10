@@ -91,7 +91,7 @@ namespace parallelBellmanFord.Common
                 for (int j = 0; j < currentEdgesToAdd; j++)
                 {
                     int toVertex = rand.Next(0, vertexCount);
-                    int ifNegative = rand.Next(0, 3);
+                    int ifNegative = rand.Next(0, 10);
                     int weight = 0;
                     if (ifNegative == 0)
                     {
