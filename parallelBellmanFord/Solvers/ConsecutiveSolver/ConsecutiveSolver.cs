@@ -22,67 +22,17 @@ namespace parallelBellmanFord.Solvers.Consecutive
             _startVerticleIndex = verticleToStartFrom;
         }
 
-        public (List<int> distances, List<int> comeFrom) SolveConsecutive()
-        {
-            _distancesToVerticles[_startVerticleIndex] = 0;
-
-            for (int timesCount = 0; timesCount < _verticlesCount - 1; timesCount++)
-            {
-                makeIteration();
-            }
-
-            CheckForNegativeCycle();
-
-            //printResult();
-
-            return (_distancesToVerticles, _comeFromIndex);
-        }
-
-        private bool makeIteration()
-        {
-            bool ifWasUpdated = false;
-            for (int i = 0; i < _verticlesCount; i++)
-            {
-                for (int j = 0; j < _verticlesCount; j++)
-                {
-                    if (i != j && _adjacencyMatrix[i][j] != 0) //only edges that have weight and not loops
-                    {
-                        if (Update(i, j))
-                        {
-                            ifWasUpdated = true;
-                        }
-                    }
-                }
-            }
-            return ifWasUpdated;
-        }
-
-        private bool Update(int fromVerticle,int toVerticle)
-        {
-            bool ifUpdated = false;
-            if (_distancesToVerticles[fromVerticle] != int.MaxValue && toVerticle != _startVerticleIndex) //if the fromVerticle is examined and not to startVerticle cycle
-            {
-                int newFromVerticalDistance = _distancesToVerticles[fromVerticle] + _adjacencyMatrix[fromVerticle][toVerticle];
-
-                if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
-                {
-                    _distancesToVerticles[toVerticle] = newFromVerticalDistance;
-                    _comeFromIndex[toVerticle] = fromVerticle;
-                    ifUpdated = true;
-                }
-            }
-            return ifUpdated;
-        }
-
-        //***********************************************************************Wave******************************************************************************
-
         public (List<int> distances, List<int> comeFrom) SolveConsecutiveWave()
         {
+            CheckIfCorrectStartVerticle();
+
             _distancesToVerticles[_startVerticleIndex] = 0;
             for (int timesCount = 0; timesCount < _verticlesCount - 1; timesCount++)
             {
                 makeIterationWave();
             }
+
+            CheckIfAnyPathNotExist();
 
             CheckForNegativeCycle();
 
@@ -90,19 +40,27 @@ namespace parallelBellmanFord.Solvers.Consecutive
 
             return (_distancesToVerticles, _comeFromIndex);
         }
-         
-        private void makeIterationWave()
+
+        private bool makeIterationWave()
         {
+            bool ifUpdated = false;
+
             bool[] visited = new bool[_verticlesCount];
             List<int> verticles = new() { _startVerticleIndex };
             expandVerticles(verticles);
             visited[_startVerticleIndex] = true;
+
             List<int> nearVerticles = findNearVerticles(verticles, ref visited);
             while (nearVerticles.Count !=0)
             {
-                expandVerticles(nearVerticles);
+                if (expandVerticles(nearVerticles))
+                {
+                    ifUpdated = true;
+                }
+                
                 nearVerticles = findNearVerticles(nearVerticles, ref visited);
             }
+            return ifUpdated;
         }
 
         private List<int> findNearVerticles(List<int> borderVerticles, ref bool[] visited)
@@ -122,25 +80,66 @@ namespace parallelBellmanFord.Solvers.Consecutive
             return near;
         }
 
-        private void expandVerticles(List<int> verticlesToExpand)
+        private bool expandVerticles(List<int> verticlesToExpand)
         {
+            bool ifUpdated = false;
             foreach (int verticleToExpand in verticlesToExpand)
             {
                 for (int j = 0; j < _verticlesCount; j++)
                 {
                     if (verticleToExpand != j && _adjacencyMatrix[verticleToExpand][j] != 0)
                     {
-                        Update(verticleToExpand, j);
+                        if(Update(verticleToExpand, j))
+                        {
+                            ifUpdated = true;
+                        }
+                        
                     }
                 }
             }
+            return ifUpdated;
+        }
+
+        private bool Update(int fromVerticle, int toVerticle)
+        {
+            bool ifUpdated = false;
+            if (_distancesToVerticles[fromVerticle] != int.MaxValue && toVerticle != _startVerticleIndex)
+            {
+                int newFromVerticalDistance = _distancesToVerticles[fromVerticle] + _adjacencyMatrix[fromVerticle][toVerticle];
+
+                if (newFromVerticalDistance < _distancesToVerticles[toVerticle])
+                {
+                    _distancesToVerticles[toVerticle] = newFromVerticalDistance;
+                    _comeFromIndex[toVerticle] = fromVerticle;
+                    ifUpdated = true;
+                }
+            }
+            return ifUpdated;
         }
 
         private void CheckForNegativeCycle()
         {
-            if (makeIteration())
+            if (makeIterationWave())
             {
                 Console.WriteLine("The Graph has negative cycle. Can not solve.");
+                System.Environment.Exit(0);
+            }
+        }
+
+        private void CheckIfAnyPathNotExist()
+        {
+            if (_distancesToVerticles.Any(el => el.Equals(int.MaxValue)))
+            {
+                Console.WriteLine("There is no path from start verticle to the others");
+                System.Environment.Exit(0);
+            }
+        }
+
+        private void CheckIfCorrectStartVerticle()
+        {
+            if (_startVerticleIndex >= _verticlesCount)
+            {
+                Console.WriteLine("The start vertex is not correct");
                 System.Environment.Exit(0);
             }
         }
@@ -150,5 +149,6 @@ namespace parallelBellmanFord.Solvers.Consecutive
             ResultOutput.printDistances(_distancesToVerticles, _startVerticleIndex);
             ResultOutput.printPaths(_comeFromIndex, _startVerticleIndex, _adjacencyMatrix);
         }
+        
     }
 }

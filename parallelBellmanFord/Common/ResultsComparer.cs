@@ -1,6 +1,4 @@
-﻿
-
-namespace parallelBellmanFord.Common
+﻿namespace parallelBellmanFord.Common
 {
     public static class ResultsComparer
     {
