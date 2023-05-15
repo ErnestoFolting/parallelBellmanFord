@@ -10,8 +10,8 @@ namespace parallelBellmanFord
         {
             string path = "adjacencySimple6Verticles2.txt";
 
-            List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
-            //List<List<int>> adjacencyMatrix = MatrixHelper.generateFullAdjacencyMatrix(500);
+            //List<List<int>> adjacencyMatrix = MatrixHelper.readMatrixFromFile(path);
+            List<List<int>> adjacencyMatrix = MatrixHelper.generateFullAdjacencyMatrix(1000);
             //List<List<int>> adjacencyMatrix = MatrixHelper.generateAdjacencyMatrix(500, 8);
             //List<List<int>> adjacencyMatrix = MatrixHelper.generateMaxIterationMatrix(1000);
             //MatrixHelper.printMatrix(adjacencyMatrix);
@@ -19,7 +19,7 @@ namespace parallelBellmanFord
             //Console.WriteLine("Consecutive = 0, Parallel = 1:, Compare = 2\n");+
             //int solverType = Convert.ToInt32(Console.ReadLine());
 
-            int solverType = 2;
+            int solverType = 1;
             int startTop = 0;
 
             const int threadsNumber = 8;
@@ -29,38 +29,41 @@ namespace parallelBellmanFord
             {
                 ConsecutiveSolver consecutiveSolver = new(adjacencyMatrix, startTop);
                 long startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                consecutiveSolver.SolveConsecutiveWave();
+                consecutiveSolver.Solve();
                 long endTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 Console.WriteLine("Consecutive time: " + (endTime - startTime));
+
             }
             else if (solverType == 1)
             {
-                ParallelSolver parallelSolver = new(adjacencyMatrix, startTop);
+                ParallelSolver parallelSolver = new(adjacencyMatrix, startTop, threadsNumber);
                 long startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                parallelSolver.SolveParallelWave();
+                parallelSolver.Solve();
                 long endTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 Console.WriteLine("Parallel time: " + (endTime - startTime));
+
             }
-            else if (solverType == 2) //check the answer correctness
+            else if (solverType == 2)
             {
                 long consecutiveStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 ConsecutiveSolver consecutiveSolver = new(adjacencyMatrix, startTop);
-                (List<int> distancesConsecutive, List<int> comeFromConsecutive) = consecutiveSolver.SolveConsecutiveWave();
+                (List<int> distancesConsecutive, List<int> comeFromConsecutive) = consecutiveSolver.Solve();
                 long consecutiveEndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
                 long parallelStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                ParallelSolver parallelSolver = new(adjacencyMatrix, startTop);
-                (List<int> distancesParallel, List<int> comeFromParallel) = parallelSolver.SolveParallelWave();
+                ParallelSolver parallelSolver = new(adjacencyMatrix, startTop, threadsNumber);
+                (List<int> distancesParallel, List<int> comeFromParallel) = parallelSolver.Solve();
                 long parallelEndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
                 ResultsComparer.compareDistances(distancesConsecutive, distancesParallel);
                 ResultsComparer.comparePaths(comeFromConsecutive, comeFromParallel);
                 Console.WriteLine("Consecutive time: " + (consecutiveEndTime - consecutiveStartTime));
                 Console.WriteLine("Parallel time: " + (parallelEndTime - parallelStartTime));
+
             }else if(solverType == 3)
             {
                 TimeMeasureHelper.measureConsecutive(adjacencyMatrix, 5);
-                TimeMeasureHelper.measureParallel(adjacencyMatrix, 5);
+                TimeMeasureHelper.measureParallel(adjacencyMatrix, 5, threadsNumber);
             }
         }
     }

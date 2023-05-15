@@ -22,7 +22,7 @@ namespace parallelBellmanFord.Solvers.Consecutive
             _startVerticleIndex = verticleToStartFrom;
         }
 
-        public (List<int> distances, List<int> comeFrom) SolveConsecutiveWave()
+        public (List<int> distances, List<int> comeFrom) Solve()
         {
             CheckIfCorrectStartVerticle();
 

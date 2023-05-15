@@ -13,7 +13,7 @@ namespace parallelBellmanFord.Common
             for (int i = 0; i < times; i++)
             {
                 long parallelStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                (List<int> distancesParallel, List<int> comeFromParallel) = solver.SolveConsecutiveWave();
+                (List<int> distancesParallel, List<int> comeFromParallel) = solver.Solve();
                 long parallelEndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 executionTimes.Add(parallelEndTime - parallelStartTime);
             }
@@ -21,15 +21,15 @@ namespace parallelBellmanFord.Common
             Console.WriteLine("Avg: " + executionTimes.Average());
         }
 
-        public static void measureParallel(List<List<int>> matr, int times)
+        public static void measureParallel(List<List<int>> matr, int times, int threadsNumber)
         {
             Console.WriteLine("Parallel algo:");
-            ParallelSolver solver = new(matr, times);
+            ParallelSolver solver = new(matr, times, threadsNumber);
             List<long> executionTimes = new();
             for (int i = 0; i < times; i++)
             {
                 long parallelStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                (List<int> distancesParallel, List<int> comeFromParallel) = solver.SolveParallelWave();
+                (List<int> distancesParallel, List<int> comeFromParallel) = solver.Solve();
                 long parallelEndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 executionTimes.Add(parallelEndTime - parallelStartTime);
             }

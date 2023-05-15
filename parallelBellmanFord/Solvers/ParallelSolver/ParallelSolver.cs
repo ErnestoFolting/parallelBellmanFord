@@ -13,8 +13,11 @@ namespace parallelBellmanFord.Solvers.Parallel
 
         private int _startVerticleIndex;
         private int _verticlesCount;
+        private int _threadsCount;
 
-        public ParallelSolver(List<List<int>> adjacencMatrix, int verticleToStartFrom)
+        private long timeCheck = 0;
+
+        public ParallelSolver(List<List<int>> adjacencMatrix, int verticleToStartFrom, int threadsCount)
         {
             _adjacencyMatrix = adjacencMatrix;
             _verticlesCount = adjacencMatrix.Count;
@@ -22,9 +25,10 @@ namespace parallelBellmanFord.Solvers.Parallel
             _comeFromIndex = new List<int>(Enumerable.Repeat(-1, _verticlesCount));
             _startVerticleIndex = verticleToStartFrom;
             _distancesToVerticles[_startVerticleIndex] = 0;
+            _threadsCount = threadsCount;
         }
 
-        public (List<int> distances, List<int> comeFrom) SolveParallelWave()
+        public (List<int> distances, List<int> comeFrom) Solve()
         {
             CheckIfCorrectStartVerticle();
 
@@ -71,6 +75,120 @@ namespace parallelBellmanFord.Solvers.Parallel
                                 isUpdated = true;
                             }
                         });
+                        tasks[indexCopy].Start();
+                    }
+                    Task.WaitAll(tasks);
+                }
+                else
+                {
+                    expandVerticles(nearVerticles);
+                }
+                nearVerticles = findNearVerticles(nearVerticles, ref visited);
+            }
+            return isUpdated;
+        }
+
+        private bool makeIterationWaveBiggerTasks()
+        {
+            bool isUpdated = false;
+            bool[] visited = new bool[_verticlesCount];
+            List<int> verticles = new() { _startVerticleIndex };
+
+            expandVerticles(verticles);
+            visited[_startVerticleIndex] = true;
+
+            List<int> nearVerticles = findNearVerticles(verticles, ref visited);
+
+            while (nearVerticles.Count != 0)
+            {
+                int nearCount = nearVerticles.Count;
+                if (nearCount > 1)
+                {
+                    Task[] tasks = new Task[_threadsCount];
+
+                    int vertexesPerTask = nearCount / _threadsCount;
+                    int extraVertexes = nearCount % _threadsCount;
+
+                    for (int i = 0; i < _threadsCount; i++)
+                    {
+                        int indexCopy = i;
+
+                        List<int> vertexesToExpand;
+                        if (indexCopy != _threadsCount - 1)
+                        {
+                            vertexesToExpand = nearVerticles.Skip(indexCopy * vertexesPerTask).Take(vertexesPerTask).ToList();
+                            
+                        }
+                        else
+                        {
+                            vertexesToExpand = nearVerticles.Skip(indexCopy * vertexesPerTask).Take(vertexesPerTask + extraVertexes).ToList();
+                        }
+
+                        tasks[indexCopy] = new Task(() =>
+                        {
+                            if (expandVerticles(vertexesToExpand))
+                            {
+                                isUpdated = true;
+                            }
+                        });
+
+                        tasks[indexCopy].Start();
+                    }
+                    Task.WaitAll(tasks);
+                }
+                else
+                {
+                    expandVerticles(nearVerticles);
+                }
+                nearVerticles = findNearVerticles(nearVerticles, ref visited);
+            }
+            return isUpdated;
+        }
+
+        private bool makeIterationDivideNumberSet()
+        {
+            bool isUpdated = false;
+            bool[] visited = new bool[_verticlesCount];
+            List<int> verticles = new() { _startVerticleIndex };
+
+            expandVerticles(verticles);
+            visited[_startVerticleIndex] = true;
+
+            List<int> nearVerticles = findNearVerticles(verticles, ref visited);
+
+            while (nearVerticles.Count != 0)
+            {
+                int nearCount = nearVerticles.Count;
+                int vertexesPerTask = 5;
+                if (nearCount > vertexesPerTask)
+                {
+                    
+                    int extraVertexes = nearCount % vertexesPerTask;
+                    int taskNumber = nearCount / vertexesPerTask;
+
+                    Task[] tasks = new Task[taskNumber];
+
+                    for (int i = 0; i < taskNumber; i++)
+                    {
+                        int indexCopy = i;
+
+                        List<int> vertexesToExpand;
+                        if (indexCopy != taskNumber - 1)
+                        {
+                            vertexesToExpand = nearVerticles.Skip(indexCopy * vertexesPerTask).Take(vertexesPerTask).ToList();
+                        }
+                        else
+                        {
+                            vertexesToExpand = nearVerticles.Skip(indexCopy * vertexesPerTask).Take(vertexesPerTask + extraVertexes).ToList();
+                        }
+
+                        tasks[indexCopy] = new Task(() => {
+                            if (expandVerticles(vertexesToExpand))
+                            {
+                                isUpdated = true;
+                            }
+                        });
+
                         tasks[indexCopy].Start();
                     }
                     Task.WaitAll(tasks);
